@@ -1,4 +1,4 @@
-import { StackContext, Api, StaticSite, Auth } from "sst/constructs";
+import { StackContext, Api, Auth, SvelteKitSite } from "sst/constructs";
 
 export function API({ stack }: StackContext) {
 	const auth = new Auth(stack, "auth", {
@@ -8,30 +8,18 @@ export function API({ stack }: StackContext) {
 	});
 
 	const api = new Api(stack, "api", {
-		defaults: {
-			function: {},
-		},
 		routes: {
 			"GET /cookie": "packages/functions/src/cookie.main",
 		},
-	});
-
-	const web = new StaticSite(stack, "web", {
-		path: "packages/web",
-		buildOutput: "dist",
-		buildCommand: "npm run build",
-		environment: {
-			VITE_APP_API_URL: api.url,
+		cors: {
+			allowCredentials: true,
+			allowHeaders: ["content-type"],
+			allowMethods: ["ANY"],
+			allowOrigins: [
+				"http://localhost:5173",
+				"https://dzu04z3f5bf8e.cloudfront.net",
+			],
 		},
-	});
-
-	api.setCors({
-		allowCredentials: true,
-		allowHeaders: ["content-type"],
-		allowMethods: ["ANY"],
-		allowOrigins: web.url
-			? ["http://localhost:5173", web.url]
-			: ["http://localhost:5173"],
 	});
 
 	auth.attach(stack, {
@@ -39,8 +27,16 @@ export function API({ stack }: StackContext) {
 		prefix: "/auth", // optional
 	});
 
+	const kit = new SvelteKitSite(stack, "site", {
+		path: "packages/kit",
+		buildCommand: "pnpm run build",
+		environment: {
+			PUBLIC_API_URL: api.customDomainUrl || api.url,
+		},
+	});
+
 	stack.addOutputs({
 		ApiEndpoint: api.url,
-		SiteUrl: web.customDomainUrl || web.url,
+		KitUrl: kit.customDomainUrl || kit.url,
 	});
 }

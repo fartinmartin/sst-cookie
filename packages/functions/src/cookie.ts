@@ -12,7 +12,7 @@ export const main = ApiHandler(async ({ cookies }) => {
 		statusCode: 200,
 		body: `Hello world. The time is ${new Date().toISOString()}.\n\nYour request came with the following cookies: ${cooks}`,
 		cookies: [
-			`test-token=${token}; HttpOnly; SameSite=None; Secure; Path=/; Expires=${expires}`,
+			`cookie-token=${token}; HttpOnly; SameSite=None; Secure; Path=/; Expires=${expires}`,
 		],
 	};
 });
