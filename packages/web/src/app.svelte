@@ -20,6 +20,13 @@
 	};
 
 	onMount(getMessage);
+
+	onMount(async () => {
+		const url = `${import.meta.env.VITE_APP_API_URL}/auth/guest/authorize`;
+		console.log(url);
+		const response = await fetch(url, { credentials: "include" });
+		console.log(response);
+	});
 </script>
 
 <main>
