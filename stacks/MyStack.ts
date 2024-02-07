@@ -19,7 +19,17 @@ export function API({ stack }: StackContext) {
 		},
 	});
 
+	api.setCors({
+		allowCredentials: true,
+		allowHeaders: ["content-type"],
+		allowMethods: ["ANY"],
+		allowOrigins: web.url
+			? ["http://localhost:5173", web.url]
+			: ["http://localhost:5173"],
+	});
+
 	stack.addOutputs({
 		ApiEndpoint: api.url,
+		SiteUrl: web.customDomainUrl || web.url,
 	});
 }
